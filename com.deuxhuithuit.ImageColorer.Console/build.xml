@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ImageColorer.Console" default="dist" basedir=".">
+<project name="ImageColorer.Console" default="run" basedir=".">
   <description></description>
   <!-- set global properties for this build -->
+  <property name="project.name" location="ImageColorer"/>
   <property name="src" location="src"/>
-  <property name="src-core" location="src"/>
+  <property name="src-core" location="../com.deuxhuithuit.ImageColorer.Console/src"/>
   <property name="build" location="bin"/>
   <property name="build-core" location="lib"/>
   <property name="dist"  location="dist"/>
-  
-  <classpath>
-      <pathelement location="${build-core}"/>
-  </classpath>
 
-  <target name="build-core">
+  <target name="build-core" depends="init">
   	<!-- Compile the java code from ${src-core} into ${build-core} -->
     <javac srcdir="${src-core}" destdir="${build-core}"/>
   </target>
@@ -27,19 +24,29 @@
 
   <target name="compile" depends="init,build-core" description="compile the source" >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}" />
+    <javac srcdir="${src}" destdir="${build}">
+   		<classpath>
+			<pathelement location="${build-core}"/>
+		</classpath>
+    </javac>
+  </target>
+  
+  <target name="run" depends="compile" description="Runs the program">
+  	<java classname="${build}/com.deuxhuithuit.ImageColorer.Console.Main">
+  		<arg value="-f:" />
+  		<arg value="-f:" />
+  	</java>
   </target>
 
   <target name="dist" depends="compile" description="generate the distribution" >
     <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
+    <mkdir dir="${dist}"/>
 
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}"/>
+    <jar jarfile="${dist}/${project-name}.jar" basedir="${build}"/><!-- -${DSTAMP} -->
   </target>
 
-  <target name="clean"
-        description="clean up" >
+  <target name="clean" description="clean up">
     <!-- Delete the ${build} and ${dist} directory trees -->
     <delete dir="${build-core}"/>
     <delete dir="${build}"/>
