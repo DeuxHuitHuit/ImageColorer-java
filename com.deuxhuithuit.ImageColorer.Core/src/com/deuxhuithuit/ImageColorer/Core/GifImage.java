@@ -1,23 +1,24 @@
 ﻿package com.deuxhuithuit.ImageColorer.Core;
 
-public class GifImage
-{
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
-	public static void CreateGifImage(tangible.RefObject<Image> refImage, tangible.RefObject<Image> destImage)
-	{
+public class GifImage {
+
+	public static void CreateGifImage(tangible.RefObject<BufferedImage> refImage, tangible.RefObject<BufferedImage> destImage) {
 		// Copy the palette to assure colors follow
-		destImage.argvalue.Palette = refImage.argvalue.Palette;
+		//destImage.argvalue.Palette = refImage.argvalue.Palette;
 
 		//now to copy the actual bitmap data
 		//lock the source and destination bits
-		BitmapData src = ((Bitmap)refImage.argvalue).LockBits(new Rectangle(0, 0, refImage.argvalue.Width, refImage.argvalue.Height), ImageLockMode.ReadOnly, refImage.argvalue.PixelFormat);
-		BitmapData dst = ((Bitmap)destImage.argvalue).LockBits(new Rectangle(0, 0, destImage.argvalue.Width, destImage.argvalue.Height), ImageLockMode.WriteOnly, destImage.argvalue.PixelFormat);
+		//BitmapData src = ((Bitmap)refImage.argvalue).LockBits(new Rectangle(0, 0, refImage.argvalue.Width, refImage.argvalue.Height), ImageLockMode.ReadOnly, refImage.argvalue.PixelFormat);
+		//BitmapData dst = ((Bitmap)destImage.argvalue).LockBits(new Rectangle(0, 0, destImage.argvalue.Width, destImage.argvalue.Height), ImageLockMode.WriteOnly, destImage.argvalue.PixelFormat);
 
 		//steps through each pixel
 		int y = 0;
 		for (y = 0; y < refImage.argvalue.Height; y++)
 		{
-//VB TO JAVA CONVERTER TODO TASK: There is no Java equivalent to VB's implicit 'once only' variable initialization within loops:
+			//VB TO JAVA CONVERTER TODO TASK: There is no Java equivalent to VB's implicit 'once only' variable initialization within loops:
 			int x;
 			for (x = 0; x < refImage.argvalue.Width; x++)
 			{
@@ -98,36 +99,29 @@ public class GifImage
 		//refImage.Palette = ncp
 	}
 
-	public static Color ParseColor(String s)
-	{
-		if (! (String.IsNullOrWhiteSpace(s)))
-		{
+	public static Color ParseColor(String s) {
+		if (s != null && s.length() > 0) {
 			int r = 0;
 			int g = 0;
 			int b = 0;
 			String[] splitted = s.split("[,]", -1);
-			if (splitted.length != 3)
-			{
-				if (s.length() == 6)
-				{
-					Integer.TryParse(s.substring(0, 2), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture, r);
-					Integer.TryParse(s.substring(2, 4), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture, g);
-					Integer.TryParse(s.substring(4, 6), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture, b);
+			if (splitted.length != 3) {
+				// try hexa, radix = 16
+				if (s.length() == 6) { // A1A1A1
+					r = Integer.parseInt(s.substring(0, 2), 16);
+					g = Integer.parseInt(s.substring(2, 4), 16);
+					b = Integer.parseInt(s.substring(4, 6), 16);
+				} else if (s.length() == 3) {
+					r = Integer.parseInt(s.substring(0, 1), 16);
+					g = Integer.parseInt(s.substring(1, 2), 16);
+					b = Integer.parseInt(s.substring(2, 3), 16);
 				}
-				else if (s.length() == 3)
-				{
-					Integer.TryParse(s.substring(0, 1), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture, r);
-					Integer.TryParse(s.substring(1, 2), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture, g);
-					Integer.TryParse(s.substring(2, 3), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture, b);
-				}
+			} else {
+				r = Integer.parseInt(splitted[0]);
+				g = Integer.parseInt(splitted[1]);
+				b = Integer.parseInt(splitted[2]);
 			}
-			else
-			{
-				Integer.TryParse(splitted[0], r);
-				Integer.TryParse(splitted[1], g);
-				Integer.TryParse(splitted[2], b);
-			}
-			return Color.FromArgb(255, r, g, b);
+			return new Color(r, g, b, 255);
 		}
 		return null;
 	}
