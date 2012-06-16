@@ -6,7 +6,7 @@
 
 ## Command line usage
 
-`ImageColorer.exe [arg:value]`
+`java com.deuxhuithuit.imagecolorer.console.main [arg:value]`
 
 Where [arg:value] can be:
 
