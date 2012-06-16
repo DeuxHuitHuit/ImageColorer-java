@@ -2,6 +2,7 @@
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 
 public class GifImage {
 
@@ -44,34 +45,28 @@ public class GifImage {
 		return bm;
 	}
 
-	public static void ReplaceColorInPalette(tangible.RefObject<Image> refImage, ColorPalette refPalette, Color victimColor, Color newColor)
-	{
+	public static void ReplaceColorInPalette(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
 		//get it's palette
-		ColorPalette ncp = refPalette;
+		IndexColorModel ncp = refPalette;
 
 		// Start with the refPalette
-		Drawing.Imaging.ColorPalette palette = refPalette;
-		for (int x = 0; x < palette.Entries.getLength(); x++)
-		{
-			Drawing.Color color = palette.Entries(x);
+		IndexColorModel palette = refPalette;
+		for (int x = 0; x < palette.getMapSize(); x++) {
+			Color color = new Color(palette.getRed(x), palette.getGreen(x), palette.getBlue(x), palette.getAlpha(x));
 			int alpha = 255;
 			// if we found our victim
-			if (color.R == victimColor.R && color.B == victimColor.B && color.G == victimColor.G)
-			{
+			if (color.getRed() == victimColor.getRed() && color.getBlue() == victimColor.getBlue() && color.getGreen() == victimColor.getGreen()) {
 				// replace it in the palette
 				ncp.Entries(x) = Drawing.Color.FromArgb(victimColor.A, newColor.R, newColor.G, newColor.B);
-			}
-			else
-			{
+			} else {
 				ncp.Entries(x) = Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
 			}
 		}
 		//re-insert the palette
-		refImage.argvalue.Palette = ncp;
+		//refImage.argvalue.Palette = ncp;
 	}
 
-	public static void ConverToGifImageWithNewColor(tangible.RefObject<Image> refImage, ColorPalette refPalette, Color victimColor, Color newColor)
-	{
+	public static void ConverToGifImageWithNewColor(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
 		ReplaceColorInPalette(refImage, refPalette, victimColor, newColor);
 
 		// Rewrite the bitmap data in a new image

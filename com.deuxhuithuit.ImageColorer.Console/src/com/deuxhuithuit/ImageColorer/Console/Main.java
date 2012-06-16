@@ -1,5 +1,7 @@
 ﻿package com.deuxhuithuit.ImageColorer.Console;
 
+import java.awt.Color;
+
 public final class Main
 {
 
