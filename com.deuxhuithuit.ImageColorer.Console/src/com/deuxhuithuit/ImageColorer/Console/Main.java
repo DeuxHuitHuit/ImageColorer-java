@@ -9,6 +9,8 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 
+import com.deuxhuithuit.ImageColorer.Core.GifImage;
+
 public final class Main {
 
 	//private static final String HEX_COLOR_FORMAT_32 = "%s%x2%x2%x2.%s"; // color is 16 bits
@@ -62,6 +64,7 @@ public final class Main {
 
 		File fileInfo = new File(file);
 
+		// better file check
 		if (fileInfo != null && fileInfo.exists() && fileInfo.canRead() && fileInfo.isFile()) {
 			ProcessFile(fileInfo);
 		} else {
@@ -95,7 +98,7 @@ public final class Main {
 					outputFolder = s.substring(3);
 					
 				} else if (s.startsWith("-c:")) {
-					victim = com.deuxhuithuit.ImageColorer.Core.GifImage.ParseColor(s.substring(3));
+					victim = GifImage.ParseColor(s.substring(3));
 				
 				} else {
 					System.out.println(String.format("Argument '%s' not valid.", s));
@@ -126,7 +129,7 @@ public final class Main {
 		// clone image
 		
 		// Convert to gif with new color
-		com.deuxhuithuit.ImageColorer.Core.GifImage.ConverToGifImageWithNewColor(refImage, (IndexColorModel) refImage.argvalue.getColorModel(), victim, new Color(r, g, b, 255));
+		GifImage.ConverToGifImageWithNewColor(refImage, (IndexColorModel) refImage.argvalue.getColorModel(), victim, new Color(r, g, b, 255));
 
 		// Sage this gif imagerefImage
 		//tangible.RefObject<BufferedImage> tempRef_newImage = new tangible.RefObject<BufferedImage>(newImage.argvalue);
@@ -146,13 +149,13 @@ public final class Main {
 	}
 
 	private static void SaveGifImage(BufferedImage newImage, int r, int g, int b) throws IOException {
-		File directory = new java.io.File(outputFolder);
+		File directory = new File(outputFolder);
 		
 		if (! (directory.exists())) {
 			directory.mkdir();
 		}
 		
-		File fileInfo = new java.io.File(String.format(colorFormat, outputFolder, sd(r), sd(g), sd(b), "gif"));
+		File fileInfo = new File(String.format(colorFormat, outputFolder, sd(r), sd(g), sd(b), "gif"));
 
 		if (fileInfo.exists()) {
 			fileInfo.delete();
