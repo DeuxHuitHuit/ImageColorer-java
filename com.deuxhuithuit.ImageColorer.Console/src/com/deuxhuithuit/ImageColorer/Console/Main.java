@@ -13,8 +13,7 @@ import javax.imageio.ImageIO;
 
 import tangible.RefObject;
 
-public final class Main
-{
+public final class Main {
 
 	private static final String HEX_COLOR_FORMAT_32 = "{0}{1:X2}{2:X2}{3:X2}.{4}"; // color is 16 bits
 	private static final String HEX_COLOR_FORMAT_16 = "{0}{1:X1}{2:X1}{3:X1}.{4}"; // color is 8 bits
@@ -66,6 +65,7 @@ public final class Main
 		} else {
 			System.out.println("ERROR: File '"+ fileInfo.getAbsolutePath() +"' does not exists. Can not continue.");
 		}
+		
 		System.out.println();
 		System.out.println("Took "+ String.format("%.3f", (new java.util.Date().getTime() - start.getTime()) / 6000) + " minutes to create " + ((Math.pow(COLOR_FORMAT, 3))) + " images");
 		System.out.println();
@@ -74,6 +74,7 @@ public final class Main
 			System.out.println("Hit <Enter> to exit...");
 			exit = System.in.read();
 		}
+		
 		System.exit(exit);
 	}
 
@@ -86,13 +87,13 @@ public final class Main
 				
 			} else {
 				if (s.startsWith("-f:")){
-					file = s.substring(0, 0) + s.substring(0 + 3);
+					file = s.substring(3);
 					
 				} else if (s.startsWith("-o:")) {
-					outputFolder = s.substring(0, 0) + s.substring(0 + 3);
+					outputFolder = s.substring(3);
 					
 				} else if (s.startsWith("-c:")) {
-					victim = com.deuxhuithuit.ImageColorer.Core.GifImage.ParseColor(s.substring(0, 0) + s.substring(0 + 3));
+					victim = com.deuxhuithuit.ImageColorer.Core.GifImage.ParseColor(s.substring(3));
 				
 				} else {
 					System.out.println(String.format("Argument '%s' not valid.", s));
