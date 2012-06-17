@@ -1,6 +1,17 @@
 ﻿package com.deuxhuithuit.ImageColorer.Console;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+
+import javax.imageio.ImageIO;
+
+import tangible.RefObject;
 
 public final class Main
 {
@@ -18,147 +29,138 @@ public final class Main
 	private static Color victim;
 	private static String colorFormat = HEX_COLOR_FORMAT_16;
 	private static int stepper = 256 / COLOR_FORMAT;
+	
+	// added for travis
+	private static boolean DEBUG = false;
 
-	public static void main()
-	{
-		parseArgs();
+	public static void main(String[] args) throws InterruptedException, IOException {
+		int exit = 0;
+		
+		parseArgs(args);
 
-		Microsoft.VisualBasic.FileSystem.WriteLine("Welcome in Deux Huit Huit's ImageColorer");
-		Microsoft.VisualBasic.FileSystem.WriteLine();
-		Microsoft.VisualBasic.FileSystem.WriteLine("File: {0}", file);
-		Microsoft.VisualBasic.FileSystem.WriteLine("Output: {0}", outputFolder);
-		Microsoft.VisualBasic.FileSystem.WriteLine("Filename format {0}", colorFormat);
-		Microsoft.VisualBasic.FileSystem.WriteLine();
-		Microsoft.VisualBasic.FileSystem.WriteLine("Color format: {0} bits", COLOR_FORMAT);
-		Microsoft.VisualBasic.FileSystem.WriteLine("Victim {0}", victim);
-		Microsoft.VisualBasic.FileSystem.WriteLine();
-		Threading.Thread.Sleep(1000);
-		Microsoft.VisualBasic.FileSystem.Write(" -> 3 -> ");
-		Threading.Thread.Sleep(1000);
-		Microsoft.VisualBasic.FileSystem.Write("2 -> ");
-		Threading.Thread.Sleep(1000);
-		Microsoft.VisualBasic.FileSystem.Write("1 -> ");
-		Threading.Thread.Sleep(1000);
-		Microsoft.VisualBasic.FileSystem.WriteLine(" GO!");
-		Microsoft.VisualBasic.FileSystem.WriteLine();
+		System.out.println("Welcome in Deux Huit Huit's ImageColorer");
+		System.out.println();
+		System.out.println("File: " + file);
+		System.out.println("Output: " + outputFolder);
+		System.out.println("Filename format " + colorFormat);
+		System.out.println();
+		System.out.println("Color format: "+ COLOR_FORMAT + " bits");
+		System.out.println("Victim " + victim);
+		System.out.println();
+		Thread.sleep(1000);
+		System.out.print(" -> 3 -> ");
+		Thread.sleep(1000);
+		System.out.print("2 -> ");
+		Thread.sleep(1000);
+		System.out.print("1 -> ");
+		Thread.sleep(1000);
+		System.out.println(" GO!");
+		System.out.println();
 
-		java.util.Date start = new java.util.Date();
+		Date start = new Date();
 
-		IO.FileInfo fileInfo = new java.io.File(file);
+		File fileInfo = new File(file);
 
-		if (fileInfo != null && fileInfo.Exists)
-		{
+		if (fileInfo != null && fileInfo.exists() && fileInfo.canRead() && fileInfo.isFile()) {
 			ProcessFile(fileInfo);
+		} else {
+			System.out.println("ERROR: File '"+ fileInfo.getAbsolutePath() +"' does not exists. Can not continue.");
 		}
-		else
-		{
-			Microsoft.VisualBasic.FileSystem.WriteLine("ERROR: File '{0}' does not exists. Can not continue.", fileInfo.FullName);
+		System.out.println();
+		System.out.println("Took "+ String.format("%.3f", (new java.util.Date().getTime() - start.getTime()) / 6000) + " minutes to create " + ((Math.pow(COLOR_FORMAT, 3))) + " images");
+		System.out.println();
+		
+		if (DEBUG) {
+			System.out.println("Hit <Enter> to exit...");
+			exit = System.in.read();
 		}
-		Microsoft.VisualBasic.FileSystem.WriteLine();
-		Microsoft.VisualBasic.FileSystem.WriteLine("Took {0:0.000} minutes to create {1} images", (new java.util.Date() - start).TotalMinutes, ((Math.pow(COLOR_FORMAT, 3))));
-		Microsoft.VisualBasic.FileSystem.WriteLine();
-		Microsoft.VisualBasic.FileSystem.WriteLine("Hit <Enter> to exit...");
-		ReadLine();
+		System.exit(exit);
 	}
 
-	private static void parseArgs()
-	{
-		for (String s : My.Application.CommandLineArgs)
-		{
-//VB TO JAVA CONVERTER NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to Java 'if-else' logic:
-//			Select Case s
+	private static void parseArgs(String[] args) {
+		for (String s : args){
+			if (s.equals("-v")) {
 
-//ORIGINAL LINE: Case "-v"
-			if (s.equals("-v"))
-			{
-
-			}
-//ORIGINAL LINE: Case Else
-			else
-			{
-				if (s.startsWith("-f:"))
-				{
+			} else if (s.equals("-b")) {
+				DEBUG = true;
+				
+			} else {
+				if (s.startsWith("-f:")){
 					file = s.substring(0, 0) + s.substring(0 + 3);
-				}
-				else if (s.startsWith("-o:"))
-				{
+					
+				} else if (s.startsWith("-o:")) {
 					outputFolder = s.substring(0, 0) + s.substring(0 + 3);
-				}
-				else if (s.startsWith("-c:"))
-				{
-					victim = Core.GifImage.ParseColor(s.substring(0, 0) + s.substring(0 + 3));
-				}
-				else
-				{
-					Microsoft.VisualBasic.FileSystem.WriteLine("Argument '{0}' not valid.", s);
+					
+				} else if (s.startsWith("-c:")) {
+					victim = com.deuxhuithuit.ImageColorer.Core.GifImage.ParseColor(s.substring(0, 0) + s.substring(0 + 3));
+				
+				} else {
+					System.out.println(String.format("Argument '%s' not valid.", s));
 				}
 			}
 		}
 	}
 
-	private static void ProcessFile(IO.FileInfo fileInfo)
-	{
-		Drawing.Image img = Drawing.Bitmap.FromFile(fileInfo.FullName);
+	private static void ProcessFile(File fileInfo) throws IOException {
+		BufferedImage img = ImageIO.read(fileInfo);
 
-		for (int r = 0; r <= 128; r += stepper)
-		{
-			for (int g = 0; g <= 32; g += stepper)
-			{
-				for (int b = 0; b <= 32; b += stepper)
-				{
-					tangible.RefObject<Drawing.Image> tempRef_img = new tangible.RefObject<Drawing.Image>(img);
+		for (int r = 0; r <= 128; r += stepper) {
+			for (int g = 0; g <= 32; g += stepper) {
+				for (int b = 0; b <= 32; b += stepper) {
+					tangible.RefObject<BufferedImage> tempRef_img = new tangible.RefObject<BufferedImage>(img);
 					CreateNewImage(tempRef_img, r, g, b);
 					img = tempRef_img.argvalue;
 				}
 			}
 		}
 
-		img.dispose();
+		//img.dispose();
 		img = null;
 	}
 
 
-	private static void CreateNewImage(tangible.RefObject<Drawing.Image> refImage, int r, int g, int b)
-	{
-		Image newImage = (Image)refImage.argvalue.Clone;
+	private static void CreateNewImage(tangible.RefObject<BufferedImage> refImage, int r, int g, int b) throws IOException {
+		// http://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
+		ColorModel cm = refImage.argvalue.getColorModel();
+		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		WritableRaster raster = refImage.argvalue.copyData(null);
+		RefObject<BufferedImage> newImage = new tangible.RefObject<BufferedImage>( new BufferedImage(cm, raster, isAlphaPremultiplied, null) );
 
 		// Convert to gif with new color
-		Core.GifImage.ConverToGifImageWithNewColor(newImage, refImage.argvalue.Palette, victim, Color.FromArgb(255, r, g, b));
+		com.deuxhuithuit.ImageColorer.Core.GifImage.ConverToGifImageWithNewColor(newImage, (IndexColorModel) refImage.argvalue.getColorModel(), victim, new Color(r, g, b, 255));
 
 		// Sage this gif image
-		tangible.RefObject<Drawing.Image> tempRef_newImage = new tangible.RefObject<Drawing.Image>(newImage);
+		tangible.RefObject<BufferedImage> tempRef_newImage = new tangible.RefObject<BufferedImage>(newImage.argvalue);
 		SaveGifImage(tempRef_newImage, r, g, b);
-		newImage = tempRef_newImage.argvalue;
+		newImage = tempRef_newImage;
 
 		// Free up resources
-		newImage.dispose();
+		//newImage.dispose();
 		newImage = null;
 	}
 
-	private static int sd(int n)
-	{
-		if (n == 0)
-		{
+	private static int sd(int n) {
+		if (n == 0) {
 			return 0;
 		}
 		return n / stepper;
 	}
 
-	private static void SaveGifImage(tangible.RefObject<Drawing.Image> newImage, int r, int g, int b)
-	{
-		if (! ((new java.io.File(outputFolder)).exists()))
-		{
-			(new java.io.File(outputFolder)).mkdir();
+	private static void SaveGifImage(tangible.RefObject<BufferedImage> newImage, int r, int g, int b) throws IOException {
+		File directory = new java.io.File(outputFolder);
+		
+		if (! (directory.exists())) {
+			directory.mkdir();
 		}
-		IO.FileInfo fileInfo = new java.io.File(String.format(colorFormat, outputFolder, sd(r), sd(g), sd(b), "gif"));
+		
+		File fileInfo = new java.io.File(String.format(colorFormat, outputFolder, sd(r), sd(g), sd(b), "gif"));
 
-		if (fileInfo.Exists)
-		{
-			fileInfo.Delete();
+		if (fileInfo.exists()) {
+			fileInfo.delete();
 		}
 
-		newImage.argvalue.Save(fileInfo.FullName, Drawing.Imaging.ImageFormat.Gif);
+		ImageIO.write(newImage.argvalue, "gif", fileInfo);
 
-		Microsoft.VisualBasic.FileSystem.WriteLine(" - File {0} as been created!", fileInfo.Name);
+		System.out.println(String.format(" - File %s as been created!", fileInfo.getName()));
 	}
 }
