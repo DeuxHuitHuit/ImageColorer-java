@@ -3,9 +3,10 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
+import java.awt.image.RGBImageFilter;
 
 public class GifImage {
-
+	
 	public static void CreateGifImage(tangible.RefObject<BufferedImage> refImage, tangible.RefObject<BufferedImage> destImage) {
 		// Copy the palette to assure colors follow
 		//destImage.argvalue.Palette = refImage.argvalue.Palette;
@@ -17,12 +18,10 @@ public class GifImage {
 
 		//steps through each pixel
 		int y = 0;
-		for (y = 0; y < refImage.argvalue.Height; y++)
-		{
+		for (y = 0; y < refImage.argvalue.Height; y++) {
 			//VB TO JAVA CONVERTER TODO TASK: There is no Java equivalent to VB's implicit 'once only' variable initialization within loops:
 			int x;
-			for (x = 0; x < refImage.argvalue.Width; x++)
-			{
+			for (x = 0; x < refImage.argvalue.Width; x++) {
 				//transferring the bytes
 				Marshal.WriteByte(dst.Scan0, dst.Stride * y + x, Marshal.ReadByte(src.Scan0, src.Stride * y + x));
 			}
@@ -33,37 +32,55 @@ public class GifImage {
 		((Bitmap)destImage.argvalue).UnlockBits(dst);
 	}
 
-	public static Image CreateGifImage(tangible.RefObject<Image> refImage)
-	{
+	public static BufferedImage CreateGifImage(tangible.RefObject<BufferedImage> refImage) {
 		//Create a new 8 bit per pixel image
-		Bitmap bm = new Bitmap(refImage.argvalue.Width, refImage.argvalue.Height, PixelFormat.Format8bppIndexed);
-
-		tangible.RefObject<Image> tempRef_bm = new tangible.RefObject<Image>(bm);
+		BufferedImage bi = new BufferedImage(refImage.argvalue.getWidth(),refImage.argvalue.getHeight(),BufferedImage.TYPE_4BYTE_ABGR);
+		
+		tangible.RefObject<BufferedImage> tempRef_bm = new tangible.RefObject<BufferedImage>(bi);
 		CreateGifImage(refImage, tempRef_bm);
-		bm = tempRef_bm.argvalue;
+		bi = tempRef_bm.argvalue;
 
-		return bm;
+		return bi;
 	}
 
-	public static void ReplaceColorInPalette(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
+	public static IndexColorModel ReplaceColorInPalette(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
 		//get it's palette
-		IndexColorModel ncp = refPalette;
+		//IndexColorModel ncp = refPalette;
 
 		// Start with the refPalette
 		IndexColorModel palette = refPalette;
-		for (int x = 0; x < palette.getMapSize(); x++) {
-			Color color = new Color(palette.getRed(x), palette.getGreen(x), palette.getBlue(x), palette.getAlpha(x));
-			int alpha = 255;
+		
+		int size = palette.getMapSize();
+		
+		byte reds[] = new byte[size];
+		byte greens[] = new byte[size];
+		byte blues[] = new byte[size];
+		byte alphas[] = new byte[size];
+		
+		palette.getReds(reds);
+		palette.getGreens(greens);
+		palette.getBlues(blues);
+		
+		for (int x = 0; x < size; x++) {
+			//Color color = new Color(palette.getRed(x), palette.getGreen(x), palette.getBlue(x), palette.getAlpha(x));
+			//int alpha = 255;
 			// if we found our victim
-			if (color.getRed() == victimColor.getRed() && color.getBlue() == victimColor.getBlue() && color.getGreen() == victimColor.getGreen()) {
+			if (reds[x] == victimColor.getRed() && blues[x] == victimColor.getBlue() && greens[x] == victimColor.getGreen()) {
 				// replace it in the palette
-				ncp.Entries(x) = Drawing.Color.FromArgb(victimColor.A, newColor.R, newColor.G, newColor.B);
-			} else {
-				ncp.Entries(x) = Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+				//ncp. = Drawing.Color.FromArgb(victimColor.A, newColor.R, newColor.G, newColor.B);
+				reds[x] = (byte) newColor.getRed();
+				greens[x] = (byte) newColor.getGreen();
+				blues[x] = (byte) newColor.getBlue();
+				alphas[x] = (byte) newColor.getAlpha();
+			//} else {
+				//ncp.Entries(x) = Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
 			}
 		}
 		//re-insert the palette
 		//refImage.argvalue.Palette = ncp;
+		
+		// return the new palette
+		return new IndexColorModel(16, size, reds, greens, blues, alphas);
 	}
 
 	public static void ConverToGifImageWithNewColor(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
