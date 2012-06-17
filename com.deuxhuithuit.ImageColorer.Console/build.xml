@@ -4,7 +4,7 @@
   <!-- set global properties for this build -->
   <property name="project.name" location="ImageColorer"/>
   <property name="src" location="src"/>
-  <property name="src-core" location="../com.deuxhuithuit.ImageColorer.Console/src"/>
+  <property name="src-core" location="../com.deuxhuithuit.ImageColorer.Core/src"/>
   <property name="build" location="bin"/>
   <property name="build-core" location="lib"/>
   <property name="dist"  location="dist"/>

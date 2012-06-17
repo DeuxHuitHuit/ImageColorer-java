@@ -1,30 +1,26 @@
-﻿package com.deuxhuithuit.ImageColorer.Console;
+package com.deuxhuithuit.ImageColorer.Console;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
 
-import tangible.RefObject;
-
 public final class Main {
 
-	private static final String HEX_COLOR_FORMAT_32 = "{0}{1:X2}{2:X2}{3:X2}.{4}"; // color is 16 bits
-	private static final String HEX_COLOR_FORMAT_16 = "{0}{1:X1}{2:X1}{3:X1}.{4}"; // color is 8 bits
-	private static final String RGB_TEXT_COLOR_FORMAT = "{0}rgb({1},{2},{3}).{4}"; // color is always 16 bits
-	private static final String RGB_FIXED_COLOR_FORMAT = "{0}{1:000}{2:000}{3:000}).{4}"; // 16 bits here too
+	private static final String HEX_COLOR_FORMAT_32 = "%s%x2%x2%x2.%s"; // color is 16 bits
+	private static final String HEX_COLOR_FORMAT_16 = "%s%x%x%x.%s"; // color is 8 bits
+	//private static final String RGB_TEXT_COLOR_FORMAT = "%srgb(%d,%d,%d).%s"; // color is always 16 bits
+	private static final String RGB_FIXED_COLOR_FORMAT = "%s%d3%d3%d3.%s"; // 16 bits here too
 
 	private static final int COLOR_FORMAT = 16; // 16 (X10) | 256 (X100)
 	//Private Const COLOR_DEPTH As Byte = 16 ' 8, 16, 24 beware! 1111 1111 / 1111 1111 / 1111 1111
 
 	private static String outputFolder = "../../output/";
-	private static String file = "../../test.gif";
+	private static String file = "../test.gif";
 	private static Color victim;
 	private static String colorFormat = HEX_COLOR_FORMAT_16;
 	private static int stepper = 256 / COLOR_FORMAT;
@@ -121,23 +117,19 @@ public final class Main {
 
 
 	private static void CreateNewImage(tangible.RefObject<BufferedImage> refImage, int r, int g, int b) throws IOException {
-		// http://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
-		ColorModel cm = refImage.argvalue.getColorModel();
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = refImage.argvalue.copyData(null);
-		RefObject<BufferedImage> newImage = new tangible.RefObject<BufferedImage>( new BufferedImage(cm, raster, isAlphaPremultiplied, null) );
-
+		// clone image
+		
 		// Convert to gif with new color
-		com.deuxhuithuit.ImageColorer.Core.GifImage.ConverToGifImageWithNewColor(newImage, (IndexColorModel) refImage.argvalue.getColorModel(), victim, new Color(r, g, b, 255));
+		com.deuxhuithuit.ImageColorer.Core.GifImage.ConverToGifImageWithNewColor(refImage, (IndexColorModel) refImage.argvalue.getColorModel(), victim, new Color(r, g, b, 255));
 
-		// Sage this gif image
-		tangible.RefObject<BufferedImage> tempRef_newImage = new tangible.RefObject<BufferedImage>(newImage.argvalue);
-		SaveGifImage(tempRef_newImage, r, g, b);
-		newImage = tempRef_newImage;
+		// Sage this gif imagerefImage
+		//tangible.RefObject<BufferedImage> tempRef_newImage = new tangible.RefObject<BufferedImage>(newImage.argvalue);
+		SaveGifImage(refImage.argvalue, r, g, b);
+		//newImage = tempRef_newImage;
 
 		// Free up resources
 		//newImage.dispose();
-		newImage = null;
+		//newImage = null;
 	}
 
 	private static int sd(int n) {
@@ -147,7 +139,7 @@ public final class Main {
 		return n / stepper;
 	}
 
-	private static void SaveGifImage(tangible.RefObject<BufferedImage> newImage, int r, int g, int b) throws IOException {
+	private static void SaveGifImage(BufferedImage newImage, int r, int g, int b) throws IOException {
 		File directory = new java.io.File(outputFolder);
 		
 		if (! (directory.exists())) {
@@ -160,7 +152,7 @@ public final class Main {
 			fileInfo.delete();
 		}
 
-		ImageIO.write(newImage.argvalue, "gif", fileInfo);
+		ImageIO.write(newImage, "gif", fileInfo);
 
 		System.out.println(String.format(" - File %s as been created!", fileInfo.getName()));
 	}
