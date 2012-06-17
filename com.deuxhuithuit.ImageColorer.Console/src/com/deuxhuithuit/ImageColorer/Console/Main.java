@@ -11,10 +11,10 @@ import javax.imageio.ImageIO;
 
 public final class Main {
 
-	private static final String HEX_COLOR_FORMAT_32 = "%s%x2%x2%x2.%s"; // color is 16 bits
+	//private static final String HEX_COLOR_FORMAT_32 = "%s%x2%x2%x2.%s"; // color is 16 bits
 	private static final String HEX_COLOR_FORMAT_16 = "%s%x%x%x.%s"; // color is 8 bits
 	//private static final String RGB_TEXT_COLOR_FORMAT = "%srgb(%d,%d,%d).%s"; // color is always 16 bits
-	private static final String RGB_FIXED_COLOR_FORMAT = "%s%d3%d3%d3.%s"; // 16 bits here too
+	//private static final String RGB_FIXED_COLOR_FORMAT = "%s%d3%d3%d3.%s"; // 16 bits here too
 
 	private static final int COLOR_FORMAT = 16; // 16 (X10) | 256 (X100)
 	//Private Const COLOR_DEPTH As Byte = 16 ' 8, 16, 24 beware! 1111 1111 / 1111 1111 / 1111 1111
@@ -69,7 +69,7 @@ public final class Main {
 		}
 		
 		System.out.println();
-		System.out.println("Took "+ String.format("%3f", (new Date().getTime() - start.getTime()) / 6000.00) + " minutes to create " + ((Math.pow(COLOR_FORMAT, 3))) + " images");
+		System.out.println(String.format("Took %.3f minutes to create %d images", (new Date().getTime() - start.getTime()) / 6000.00, (int) Math.pow(COLOR_FORMAT, 3)));
 		System.out.println();
 		
 		if (DEBUG) {
