@@ -1,4 +1,4 @@
-# Image Colorer
+# Image Colorer [![Build Status](https://secure.travis-ci.org/nitriques/ImageColorer-java.png?branch=master)](http://travis-ci.org/nitriques/ImageColorer-java)
 
 ### Changes pixels colors in order to generate a new image for each color in RGB space
 
