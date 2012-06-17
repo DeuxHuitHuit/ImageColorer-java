@@ -151,7 +151,7 @@ public final class Main {
 	private static void SaveGifImage(BufferedImage newImage, int r, int g, int b) throws IOException {
 		File directory = new File(outputFolder);
 		
-		if (! (directory.exists())) {
+		if (!directory.exists()) {
 			directory.mkdir();
 		}
 		

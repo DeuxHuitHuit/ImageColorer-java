@@ -31,7 +31,7 @@
     </javac>
   </target>
   
-  <target name="run" depends="compile" description="Runs the program">
+  <target name="run" depends="clean,compile" description="Runs the program">
   	<java classname="com.deuxhuithuit.ImageColorer.Console.Main">
   		<classpath>
   			<pathelement path="${build-core}"/>
