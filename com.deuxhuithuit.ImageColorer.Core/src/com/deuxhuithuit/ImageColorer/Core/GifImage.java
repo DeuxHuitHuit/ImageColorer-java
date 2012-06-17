@@ -93,7 +93,7 @@ public class GifImage {
 		//refImage.argvalue.Palette = ncp;
 		
 		// return the new palette
-		return new IndexColorModel(16, size, reds, greens, blues, alphas);
+		return new IndexColorModel(palette.getPixelSize(), size, reds, greens, blues, alphas);
 	}
 
 	public static void ConverToGifImageWithNewColor(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {

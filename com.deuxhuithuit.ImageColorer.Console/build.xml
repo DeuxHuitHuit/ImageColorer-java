@@ -11,7 +11,7 @@
 
   <target name="build-core" depends="init">
   	<!-- Compile the java code from ${src-core} into ${build-core} -->
-    <javac srcdir="${src-core}" destdir="${build-core}"/>
+    <javac srcdir="${src-core}" destdir="${build-core}" includeantruntime="false"/>
   </target>
 
   <target name="init">
@@ -24,7 +24,7 @@
 
   <target name="compile" depends="init,build-core" description="compile the source" >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}">
+    <javac srcdir="${src}" destdir="${build}" includeantruntime="false">
    		<classpath>
 			<pathelement location="${build-core}"/>
 		</classpath>
@@ -32,9 +32,14 @@
   </target>
   
   <target name="run" depends="compile" description="Runs the program">
-  	<java classname="${build}/com.deuxhuithuit.ImageColorer.Console.Main">
-  		<arg value="-f:" />
-  		<arg value="-f:" />
+  	<java classname="com.deuxhuithuit.ImageColorer.Console.Main">
+  		<classpath>
+  			<pathelement path="${build-core}"/>
+  			<pathelement path="${build}"/>  		
+  		</classpath>
+  		<arg value="-f:test.gif" />
+  		<arg value="-o:../gif-output/" />
+  		<arg value="-c:000" />
   	</java>
   </target>
 

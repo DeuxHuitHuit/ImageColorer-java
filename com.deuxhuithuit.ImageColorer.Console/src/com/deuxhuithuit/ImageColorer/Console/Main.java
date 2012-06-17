@@ -20,7 +20,7 @@ public final class Main {
 	//Private Const COLOR_DEPTH As Byte = 16 ' 8, 16, 24 beware! 1111 1111 / 1111 1111 / 1111 1111
 
 	private static String outputFolder = "../../output/";
-	private static String file = "../test.gif";
+	private static String file = "../../test.gif";
 	private static Color victim;
 	private static String colorFormat = HEX_COLOR_FORMAT_16;
 	private static int stepper = 256 / COLOR_FORMAT;
@@ -41,6 +41,12 @@ public final class Main {
 		System.out.println();
 		System.out.println("Color format: "+ COLOR_FORMAT + " bits");
 		System.out.println("Victim " + victim);
+		
+		if (victim == null) {
+			System.err.println("No victim color found. Can not continue.");
+			System.exit(1);
+		}
+		
 		System.out.println();
 		Thread.sleep(1000);
 		System.out.print(" -> 3 -> ");
@@ -63,7 +69,7 @@ public final class Main {
 		}
 		
 		System.out.println();
-		System.out.println("Took "+ String.format("%.3f", (new java.util.Date().getTime() - start.getTime()) / 6000) + " minutes to create " + ((Math.pow(COLOR_FORMAT, 3))) + " images");
+		System.out.println("Took "+ String.format("%3f", (new Date().getTime() - start.getTime()) / 6000.00) + " minutes to create " + ((Math.pow(COLOR_FORMAT, 3))) + " images");
 		System.out.println();
 		
 		if (DEBUG) {
