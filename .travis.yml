@@ -2,4 +2,6 @@ language: java
 jdk:
   - openjdk7
   - oraclejdk7
-script: build.sh
+  - openjdk6
+  - oraclejdk6
+script: ant
