@@ -47,9 +47,13 @@
     <!-- Create the distribution directory -->
     <mkdir dir="${dist}"/>
 
+  	<copy todir="${build}">
+  		<fileset dir="${build-core}"/>
+  	</copy>
+  	
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar destfile="${dist}/${project-name}.jar" basedir="${build}/.." 
-    	includes="${build}/**/*.class,${build-core}/**/*.class">
+    <jar destfile="${dist}/${project-name}.jar" basedir="${build}"
+    	includes="**/*.class">
   		<!-- -${DSTAMP} -->
     	<manifest>
     	      <attribute name="Main-Class" value="com.deuxhuithuit.ImageColorer.Console.Main"/>

@@ -78,7 +78,11 @@ public class GifImage {
 			//Color color = new Color(palette.getRed(x), palette.getGreen(x), palette.getBlue(x), palette.getAlpha(x));
 			//int alpha = 255;
 			// if we found our victim
-			if (reds[x] == victimColor.getRed() && blues[x] == victimColor.getBlue() && greens[x] == victimColor.getGreen()) {
+			int r = reds[x] & 0xFF;
+			int g = greens[x] & 0xFF;
+			int b = blues[x] & 0xFF;
+			
+			if (r == victimColor.getRed() && b == victimColor.getBlue() && g == victimColor.getGreen()) {
 				// replace it in the palette
 				//ncp. = Drawing.Color.FromArgb(victimColor.A, newColor.R, newColor.G, newColor.B);
 				reds[x] = (byte) newColor.getRed();
@@ -93,14 +97,16 @@ public class GifImage {
 		//refImage.argvalue.Palette = ncp;
 		
 		// return the new palette
-		return new IndexColorModel(palette.getPixelSize(), size, reds, greens, blues, alphas);
+		IndexColorModel newPalette = new IndexColorModel(palette.getPixelSize(), size,  reds, greens, blues, alphas);
+		
+		return newPalette;
 	}
 
 	public static void ConverToGifImageWithNewColor(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
 		IndexColorModel newPalette = ReplaceColorInPalette(refImage, refPalette, victimColor, newColor);
 
 		// Rewrite the bitmap data in a new image
-		BufferedImage gifImage = CreateGifImage(refImage, newPalette);
+		BufferedImage gifImage = CreateGifImage(refImage, refPalette);
 
 		// replace ref param
 		refImage.argvalue = gifImage;
