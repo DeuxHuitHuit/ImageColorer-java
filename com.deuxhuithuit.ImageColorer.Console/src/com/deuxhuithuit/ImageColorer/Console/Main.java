@@ -115,7 +115,6 @@ public final class Main {
 				for (int b = 0; b <= 32; b += stepper) {
 					tangible.RefObject<BufferedImage> tempRef_img = new tangible.RefObject<BufferedImage>(img);
 					CreateNewImage(tempRef_img, r, g, b);
-					img = tempRef_img.argvalue;
 				}
 			}
 		}
