@@ -8,7 +8,6 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.IndexColorModel;
-import java.awt.image.LookupOp;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
 
@@ -160,7 +159,7 @@ public class GifImage {
 				original.getWidth(), original.getHeight(),
 			    BufferedImage.TYPE_INT_ARGB );
 			Graphics2D g2 = dest.createGraphics();
-			g2.setComposite(AlphaComposite.DstIn);
+			//g2.setComposite(AlphaComposite.DstIn);
 			g2.drawImage(img, 0, 0, null);
 			g2.dispose();
 		

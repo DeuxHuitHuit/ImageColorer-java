@@ -39,7 +39,7 @@
   		</classpath>
   		<arg value="-f:test.gif" />
   		<arg value="-o:../gif-output/" />
-  		<arg value="-c:181,181,181" />
+  		<arg value="-c:999999" />
   	</java>
   </target>
 
