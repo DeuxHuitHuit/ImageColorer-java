@@ -1,13 +1,52 @@
 package com.deuxhuithuit.ImageColorer.Core;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
 import java.awt.image.IndexColorModel;
+import java.awt.image.LookupOp;
+import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class GifImage {
+	
+	// http://stackoverflow.com/questions/5264706/how-to-replace-color-of-an-image
+	// http://docs.oracle.com/javase/6/docs/api/java/awt/image/FilteredImageSource.html
+	// http://docs.oracle.com/javase/6/docs/api/java/awt/image/RGBImageFilter.html
+	protected static final class ChangeOneColorImageFilter extends RGBImageFilter {
+		 private Color _victimColor;
+		 private Color _newColor;
+		 private int _trans;
+		 
+         public ChangeOneColorImageFilter (Color victimColor, Color newColor, int trans) {
+             // The filter's operation does not depend on the
+             // pixel's location, so IndexColorModels can be
+             // filtered directly.
+             canFilterIndexColorModel = true;
+             
+             _newColor = newColor;
+             _victimColor = victimColor;
+             _trans = trans;
+         }
+
+         public int filterRGB(int x, int y, int rgb) {
+        	 if (rgb == _trans) {
+        		 return rgb;
+        	 }
+        	 if (rgb == (_victimColor.getRGB() | 0xFF000000)) {
+        		// found our victim, return the new color
+        		 return _newColor.getRGB();
+        	 }
+        	 // return original color
+        	 return rgb;
+         }
+     }
 	
 	public static void CreateGifImage(tangible.RefObject<BufferedImage> refImage, tangible.RefObject<BufferedImage> destImage) {
 		// Copy the palette to assure colors follow
@@ -56,12 +95,12 @@ public class GifImage {
 		return bi;
 	}
 
-	public static IndexColorModel ReplaceColorInPalette(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
+	public static void ReplaceColorInPalette(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
 		//get it's palette
 		//IndexColorModel ncp = refPalette;
 
 		// Start with the refPalette
-		IndexColorModel palette = refPalette;
+		/*IndexColorModel palette = refPalette;
 		
 		int size = palette.getMapSize();
 		
@@ -99,17 +138,34 @@ public class GifImage {
 		// return the new palette
 		IndexColorModel newPalette = new IndexColorModel(palette.getPixelSize(), size,  reds, greens, blues, alphas);
 		
-		return newPalette;
+		return newPalette;*/
 	}
 
 	public static void ConverToGifImageWithNewColor(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
-		IndexColorModel newPalette = ReplaceColorInPalette(refImage, refPalette, victimColor, newColor);
-
+		//IndexColorModel newPalette = ReplaceColorInPalette(refImage, refPalette, victimColor, newColor);
+		BufferedImage original = refImage.argvalue;
+		
+		
 		// Rewrite the bitmap data in a new image
-		BufferedImage gifImage = CreateGifImage(refImage, refPalette);
-
+		//BufferedImage gifImage = CreateGifImage(refImage, newPalette);
+		int tp = ((IndexColorModel) refImage.argvalue.getColorModel()).getTransparentPixel();
+		ChangeOneColorImageFilter colorFilter = new ChangeOneColorImageFilter(victimColor, newColor, refImage.argvalue.getColorModel().getRGB(tp));
+		
+		FilteredImageSource fis = new FilteredImageSource(refImage.argvalue.getSource(), colorFilter);
+		
+		Image img = Toolkit.getDefaultToolkit().createImage(fis);
+		
+		//fis.startProduction(refImage.argvalue);
+		BufferedImage dest = new BufferedImage(
+				original.getWidth(), original.getHeight(),
+			    BufferedImage.TYPE_INT_ARGB );
+			Graphics2D g2 = dest.createGraphics();
+			g2.setComposite(AlphaComposite.DstIn);
+			g2.drawImage(img, 0, 0, null);
+			g2.dispose();
+		
 		// replace ref param
-		refImage.argvalue = gifImage;
+		refImage.argvalue = dest;
 	}
 
 	public static void ReplaceTransparencyColor() {
