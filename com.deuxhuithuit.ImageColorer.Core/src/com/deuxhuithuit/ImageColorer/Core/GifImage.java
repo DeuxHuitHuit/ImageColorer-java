@@ -1,6 +1,5 @@
 package com.deuxhuithuit.ImageColorer.Core;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -15,9 +14,17 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class GifImage {
 	
-	// http://stackoverflow.com/questions/5264706/how-to-replace-color-of-an-image
-	// http://docs.oracle.com/javase/6/docs/api/java/awt/image/FilteredImageSource.html
-	// http://docs.oracle.com/javase/6/docs/api/java/awt/image/RGBImageFilter.html
+	/**
+	 * 
+	 * @author DeuxHuitHuit
+	 *
+	 * This class reprensent a simple Image Filter.
+	 * This is the actual code that permits the color swap in Java.
+	 * 
+	 * @see http://stackoverflow.com/questions/5264706/how-to-replace-color-of-an-image
+ 	 * @see http://docs.oracle.com/javase/6/docs/api/java/awt/image/FilteredImageSource.html
+	 * @see http://docs.oracle.com/javase/6/docs/api/java/awt/image/RGBImageFilter.html
+	 */
 	protected static final class ChangeOneColorImageFilter extends RGBImageFilter {
 		 private Color _victimColor;
 		 private Color _newColor;
@@ -35,139 +42,81 @@ public class GifImage {
          }
 
          public int filterRGB(int x, int y, int rgb) {
+        	 // if this is the transparent color, return it now
         	 if (rgb == _trans) {
         		 return rgb;
         	 }
+        	 
+        	 // if we found our victim color, and this color is opaque
         	 if (rgb == (_victimColor.getRGB() | 0xFF000000)) {
         		// found our victim, return the new color
         		 return _newColor.getRGB();
         	 }
+        	 
         	 // return original color
         	 return rgb;
          }
      }
 	
 	public static void CreateGifImage(tangible.RefObject<BufferedImage> refImage, tangible.RefObject<BufferedImage> destImage) {
-		// Copy the palette to assure colors follow
-		//destImage.argvalue.Palette = refImage.argvalue.Palette;
-
-		//now to copy the actual bitmap data
-		//lock the source and destination bits
-		//BitmapData src = ((Bitmap)refImage.argvalue).LockBits(new Rectangle(0, 0, refImage.argvalue.Width, refImage.argvalue.Height), ImageLockMode.ReadOnly, refImage.argvalue.PixelFormat);
-		//BitmapData dst = ((Bitmap)destImage.argvalue).LockBits(new Rectangle(0, 0, destImage.argvalue.Width, destImage.argvalue.Height), ImageLockMode.WriteOnly, destImage.argvalue.PixelFormat);
-
-		//steps through each pixel
-		//int y = 0;
-		//for (y = 0; y < refImage.argvalue.Height; y++) {
-			//VB TO JAVA CONVERTER TODO TASK: There is no Java equivalent to VB's implicit 'once only' variable initialization within loops:
-			//int x;
-			//for (x = 0; x < refImage.argvalue.Width; x++) {
-				//transferring the bytes
-				//Marshal.WriteByte(dst.Scan0, dst.Stride * y + x, Marshal.ReadByte(src.Scan0, src.Stride * y + x));
-			//}
-		//}
-
-		//all done, unlock the bitmaps
-		//((Bitmap)refImage.argvalue).UnlockBits(src);
-		//((Bitmap)destImage.argvalue).UnlockBits(dst);
-		
 		// "This method comes from the .NET version." +
 		// "But since it's impossible to change the image's palette in java, there is not need for this pseudo clone method"
+		// This was done this was in VB.NET to help memory management
 		throw new NotImplementedException();
 	}
 
-	public static BufferedImage CreateGifImage(tangible.RefObject<BufferedImage> refImage, IndexColorModel cm) {
-		
-		// http://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
-		//ColorModel cm = refImage.argvalue.getColorModel();
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = refImage.argvalue.copyData(null);
-		//RefObject<BufferedImage> newImage = new tangible.RefObject<BufferedImage>( new BufferedImage(cm, raster, isAlphaPremultiplied, null) );
-
-		//Create a new 8 bit per pixel image
-		BufferedImage bi = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-		
-		//tangible.RefObject<BufferedImage> tempRef_bm = new tangible.RefObject<BufferedImage>(bi);
-		//CreateGifImage(refImage, tempRef_bm);
-		//bi = tempRef_bm.argvalue;
-
-		return bi;
-	}
-
-	public static void ReplaceColorInPalette(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
-		//get it's palette
-		//IndexColorModel ncp = refPalette;
-
-		// Start with the refPalette
-		/*IndexColorModel palette = refPalette;
-		
-		int size = palette.getMapSize();
-		
-		byte reds[] = new byte[size];
-		byte greens[] = new byte[size];
-		byte blues[] = new byte[size];
-		byte alphas[] = new byte[size];
-		
-		palette.getReds(reds);
-		palette.getGreens(greens);
-		palette.getBlues(blues);
-		
-		for (int x = 0; x < size; x++) {
-			//Color color = new Color(palette.getRed(x), palette.getGreen(x), palette.getBlue(x), palette.getAlpha(x));
-			//int alpha = 255;
-			// if we found our victim
-			int r = reds[x] & 0xFF;
-			int g = greens[x] & 0xFF;
-			int b = blues[x] & 0xFF;
-			
-			if (r == victimColor.getRed() && b == victimColor.getBlue() && g == victimColor.getGreen()) {
-				// replace it in the palette
-				//ncp. = Drawing.Color.FromArgb(victimColor.A, newColor.R, newColor.G, newColor.B);
-				reds[x] = (byte) newColor.getRed();
-				greens[x] = (byte) newColor.getGreen();
-				blues[x] = (byte) newColor.getBlue();
-				alphas[x] = (byte) newColor.getAlpha();
-			//} else {
-				//ncp.Entries(x) = Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
-			}
-		}
-		//re-insert the palette
-		//refImage.argvalue.Palette = ncp;
-		
-		// return the new palette
-		IndexColorModel newPalette = new IndexColorModel(palette.getPixelSize(), size,  reds, greens, blues, alphas);
-		
-		return newPalette;*/
-	}
-
-	public static void ConverToGifImageWithNewColor(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
-		//IndexColorModel newPalette = ReplaceColorInPalette(refImage, refPalette, victimColor, newColor);
-		BufferedImage original = refImage.argvalue;
-		
-		
-		// Rewrite the bitmap data in a new image
-		//BufferedImage gifImage = CreateGifImage(refImage, newPalette);
-		int tp = ((IndexColorModel) refImage.argvalue.getColorModel()).getTransparentPixel();
-		ChangeOneColorImageFilter colorFilter = new ChangeOneColorImageFilter(victimColor, newColor, refImage.argvalue.getColorModel().getRGB(tp));
-		
-		FilteredImageSource fis = new FilteredImageSource(refImage.argvalue.getSource(), colorFilter);
-		
+	public static void CreateGifImage(tangible.RefObject<BufferedImage> refImage, FilteredImageSource fis, IndexColorModel cm) {
+		// Create the actual image
 		Image img = Toolkit.getDefaultToolkit().createImage(fis);
 		
-		//fis.startProduction(refImage.argvalue);
-		BufferedImage dest = new BufferedImage(
-				original.getWidth(), original.getHeight(),
-			    BufferedImage.TYPE_INT_ARGB );
-			Graphics2D g2 = dest.createGraphics();
-			//g2.setComposite(AlphaComposite.DstIn);
-			g2.drawImage(img, 0, 0, null);
-			g2.dispose();
+		// Create a new buffered (in-memory) image
+		BufferedImage dest = new BufferedImage(refImage.argvalue.getWidth(), refImage.argvalue.getHeight(), BufferedImage.TYPE_INT_ARGB );
+		// Get its graphic instance
+		Graphics2D g2 = dest.createGraphics();
 		
-		// replace ref param
+		// N.B. This next call should be here, but it fails on old Java version
+		// g2.setComposite(AlphaComposite.DstIn);
+		
+		// Draw the new image into the buffered one
+		g2.drawImage(img, 0, 0, null);
+		
+		// Dispose the graphics to free some memory
+		g2.dispose();
+		
+		// Replace ref parameter
+		// This pointer swap serves as the "ByRef" keyword in VB.NET
 		refImage.argvalue = dest;
 	}
 
+	public static FilteredImageSource ReplaceColorInPalette(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
+		// Get the color use as transparency
+		int tp = ((IndexColorModel) refImage.argvalue.getColorModel()).getTransparentPixel();
+		
+		// Create a new instance of our color filter
+		ChangeOneColorImageFilter colorFilter = new ChangeOneColorImageFilter(victimColor, newColor, refImage.argvalue.getColorModel().getRGB(tp));
+		
+		// Create an image source for our consumer
+		FilteredImageSource fis = new FilteredImageSource(refImage.argvalue.getSource(), colorFilter);
+		
+		// Return the new image source
+		return fis;
+	}
+
+	public static void ConverToGifImageWithNewColor(tangible.RefObject<BufferedImage> refImage, IndexColorModel refPalette, Color victimColor, Color newColor) {
+		// N.B. The refPalette object does not have any purpose in this version
+		// It is passed to internal method just to keep the signature as-is
+		
+		// Get a new image source, with the color changed
+		FilteredImageSource fis = ReplaceColorInPalette(refImage, refPalette, victimColor, newColor);
+		
+		// Write it to memory
+		CreateGifImage(refImage, fis, refPalette);
+	}
+
 	public static void ReplaceTransparencyColor() {
+		// N.B. This code was commented in the Original VB.NET version
+		// We left it here just for the reader
+		
 		//copy all the entries from the old palette removing any transparency
 		//Dim n As Integer = 0
 		//Dim c As Color
