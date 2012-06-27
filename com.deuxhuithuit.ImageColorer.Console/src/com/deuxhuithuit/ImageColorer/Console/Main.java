@@ -13,6 +13,7 @@ import com.deuxhuithuit.ImageColorer.Core.GifImage;
 
 public final class Main {
 
+	// Unuse constant have been commented out
 	//private static final String HEX_COLOR_FORMAT_32 = "%s%x2%x2%x2.%s"; // color is 16 bits
 	private static final String HEX_COLOR_FORMAT_16 = "%s%x%x%x.%s"; // color is 8 bits
 	//private static final String RGB_TEXT_COLOR_FORMAT = "%srgb(%d,%d,%d).%s"; // color is always 16 bits
@@ -27,7 +28,7 @@ public final class Main {
 	private static String colorFormat = HEX_COLOR_FORMAT_16;
 	private static int stepper = 256 / COLOR_FORMAT;
 	
-	// added for travis
+	// added for travis-ci (see http://travis-ci.org/DeuxHuitHuit/ImageColorer-java)
 	private static boolean DEBUG = false;
 
 	public static void main(String[] args) throws InterruptedException, IOException {
@@ -108,36 +109,31 @@ public final class Main {
 	}
 
 	private static void ProcessFile(File fileInfo) throws IOException {
+		// Read file from disk
 		BufferedImage img = ImageIO.read(fileInfo);
 
+		// For each color in the RBG space
 		for (int r = 0; r <= 128; r += stepper) {
 			for (int g = 0; g <= 32; g += stepper) {
 				for (int b = 0; b <= 32; b += stepper) {
+					// Create a "ByRef" parameter in java
 					tangible.RefObject<BufferedImage> tempRef_img = new tangible.RefObject<BufferedImage>(img);
+					
+					// Create a new image for this color
+					// The first param will get updated with the new image
 					CreateNewImage(tempRef_img, r, g, b);
 				}
 			}
 		}
-
-		//img.dispose();
-		img = null;
 	}
 
 
 	private static void CreateNewImage(tangible.RefObject<BufferedImage> refImage, int r, int g, int b) throws IOException {
-		// clone image
-		
 		// Convert to gif with new color
 		GifImage.ConverToGifImageWithNewColor(refImage, (IndexColorModel) refImage.argvalue.getColorModel(), victim, new Color(r, g, b, 255));
 
-		// Sage this gif imagerefImage
-		//tangible.RefObject<BufferedImage> tempRef_newImage = new tangible.RefObject<BufferedImage>(newImage.argvalue);
+		// Sage this gif to disk
 		SaveGifImage(refImage.argvalue, r, g, b);
-		//newImage = tempRef_newImage;
-
-		// Free up resources
-		//newImage.dispose();
-		//newImage = null;
 	}
 
 	private static int sd(int n) {
