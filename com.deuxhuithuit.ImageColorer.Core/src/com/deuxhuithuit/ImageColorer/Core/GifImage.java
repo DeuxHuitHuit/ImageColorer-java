@@ -8,8 +8,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RGBImageFilter;
-import java.awt.image.WritableRaster;
-
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class GifImage {
